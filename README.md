@@ -18,37 +18,86 @@ Pygame 是免费的，在 GPL 许可下发布，你可以创建开源，免费�
 pip install pygame
 ```
 
-## 开始
+## 很全的例子
 
+[programarcadegames](http://programarcadegames.com/index.php?lang=cn)
+
+## 开始
 ![pygame loop](https://upload-images.jianshu.io/upload_images/1705744-eecbfb9b78a017d6.png?imageMogr2/auto-orient/strip|imageView2/2/w/683/format/webp)
 
 ```python
-# -*- coding: UTF-8 -*-
+""" 
+ Show how to use a sprite backed by a graphic.
+ 
+ Sample Python/Pygame Programs
+ Simpson College Computer Science
+ http://programarcadegames.com/
+ http://simpson.edu/computer-science/
 
-import pygame, sys
-# 声明 导入pygame和sys模块，这样我们的程序才可以使用里面的方法
+"""
 
-from pygame.locals import *
-# 也是声明导入， 只是形式不同，导入所有 pygame.locals里的变量（比如下面大写的QUIT变量）
+import pygame
 
+# The use of the main function is described in Chapter 9.
 
-pygame.init()# 初始化pygame
+# Define some colors as global constants
+BLACK    = (   0,   0,   0)
+WHITE    = ( 255, 255, 255)
+GREEN    = (   0, 255,   0)
+RED      = ( 255,   0,   0)
 
-DISPLAYSURF = pygame.display.set_mode((400, 300))# 设置窗口的大小单位为像素
+def main():
+    """ Main function for the game. """
+    pygame.init()
+     
+    # Set the width and height of the screen [width,height]
+    size = [700, 500]
+    screen = pygame.display.set_mode(size)
 
-pygame.display.set_caption('Hello World!')# 设置窗口的标题
+    pygame.display.set_caption("My Game")
 
-while True: # 程序主循环
+    #Loop until the user clicks the close button.
+    done = False
 
-    for event in pygame.event.get():# 获取事件
+    # Used to manage how fast the screen updates
+    clock = pygame.time.Clock()
 
-        if event.type == QUIT:# 判断事件是否为退出事件
+    # -------- Main Program Loop -----------
+    while not done:
+        # ALL EVENT PROCESSING SHOULD GO BELOW THIS COMMENT
+        for event in pygame.event.get(): # User did something
+            if event.type == pygame.QUIT: # If user clicked close
+                done = True # Flag that we are done so we exit this loop
+        # ALL EVENT PROCESSING SHOULD GO ABOVE THIS COMMENT
+     
+     
+        # ALL GAME LOGIC SHOULD GO BELOW THIS COMMENT
 
-            pygame.quit()# 退出pygame
+        # ALL GAME LOGIC SHOULD GO ABOVE THIS COMMENT
 
-            sys.exit()# 退出系统
+        
 
-    pygame.display.update()# 绘制屏幕内容
+        # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
+        
+        # First, clear the screen to white. Don't put other drawing commands
+        # above this, or they will be erased with this command.
+        screen.fill(WHITE)
+        
+        # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
+        
+        # Go ahead and update the screen with what we've drawn.
+        pygame.display.flip()
+
+        # Limit to 20 frames per second
+        clock.tick(20)
+        
+    # Close the window and quit.
+    # If you forget this line, the program will 'hang'
+    # on exit if running from IDLE.
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
 ```
 
 ## Pygame 常用模块
