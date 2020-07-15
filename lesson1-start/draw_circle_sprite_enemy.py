@@ -23,7 +23,7 @@ SCREEN_HEIGHT = 600
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surf = pygame.image.load("spr_missile.png").convert()
+        self.surf = pygame.image.load("resources/images/spr_missile.png").convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect()
 
@@ -54,7 +54,7 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super(Enemy, self).__init__()
-        self.surf = pygame.image.load("spr_missile_half.png").convert()
+        self.surf = pygame.image.load("resources/images/spr_missile_half.png").convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(
             center=(
@@ -78,7 +78,7 @@ class Cloud(pygame.sprite.Sprite):
 
     def __init__(self):
         super(Cloud, self).__init__()
-        self.surf = pygame.image.load("cloud_scene.png").convert()
+        self.surf = pygame.image.load("resources/images/cloud_scene.png").convert()
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         # The starting position is randomly generated
         self.rect = self.surf.get_rect(
@@ -134,9 +134,9 @@ all_sprites.add(player)
 
 # Load all sound files
 # Sound sources: Jon Fincher
-move_up_sound = pygame.mixer.Sound("qubodup-crash.ogg")
-move_down_sound = pygame.mixer.Sound("qubodup-crash.ogg")
-collision_sound = pygame.mixer.Sound("qubodup-crash.ogg")
+move_up_sound = pygame.mixer.Sound("resources/audio/qubodup-crash.ogg")
+move_down_sound = pygame.mixer.Sound("resources/audio/qubodup-crash.ogg")
+collision_sound = pygame.mixer.Sound("resources/audio/qubodup-crash.ogg")
 
 # Variable to keep the main loop running
 running = True
@@ -190,7 +190,7 @@ while running:
         screen.blit(entity.surf, entity.rect)
 
     # Check if any enemies have collided with the player
-    if pygame.sprite.spritecollideany(player, enemies, lambda player: print(player.id)):
+    if pygame.sprite.spritecollideany(player, enemies):
         # If so, then remove the player and stop the loop
         # Stop any moving sounds and play the collision sound
         move_up_sound.stop()

@@ -29,24 +29,21 @@ font_style = pygame.font.SysFont("bahnschrift", 25)
 score_font = pygame.font.SysFont("comicsansms", 35)
  
 #  画出蛇身体
-# snake_list = [[100, 100], [ 100, 102 ], [ 100, 103 ]]
-# def draw_our_snake(snake_block, snake_list):
-#     for block in snake_list:
-#         pygame.draw.rect(dis, green, [block[0], block[1], snake_block, snake_block])
 def draw_our_snake(snake_block, snake_list):
-    block = [100, 100]
-    pygame.draw.rect(dis, green, [block[0], block[1], snake_block, snake_block])
+    for block in snake_list:
+        # block = [100, 100]
+        pygame.draw.rect(dis, green, [block[0], block[1], snake_block, snake_block])
  
 #  启动
 def gameLoop():
     game_over = False
     game_close = False
     # #  开始位置在屏幕中央
-    # x1 = dis_width / 2
-    # y1 = dis_height / 2
+    x1 = dis_width / 2
+    y1 = dis_height / 2
     # # 记录位置的更改
-    # x1_change = 0
-    # y1_change = 0
+    x1_change = 0
+    y1_change = 0
  
     snake_List = []
     Length_of_snake = 1
@@ -89,21 +86,21 @@ def gameLoop():
         # --------------------key event --------------------------------------
         # 
 
-        # 计算将要移动到的位置
-        # x1 += x1_change
-        # y1 += y1_change
+        # 计算将要移动到的位置 key left will cuase x1 = 300 - 10 = 290
+        x1 = x1 + x1_change
+        y1 = y1 + y1_change
 
         dis.fill(black)
 
         # # 生成一个蛇头
-        # snake_Head = []
-        # snake_Head.append(x1)
-        # snake_Head.append(y1)
-        # snake_List.append(snake_Head)
+        snake_Head = []
+        snake_Head.append(x1)
+        snake_Head.append(y1)
+        snake_List.append(snake_Head)
 
         # # 去掉第一个元素
-        # if len(snake_List) > Length_of_snake:
-        #     del snake_List[0]
+        if len(snake_List) > Length_of_snake:
+            del snake_List[0]
  
         # 画出蛇身体
         draw_our_snake(snake_block, snake_List)

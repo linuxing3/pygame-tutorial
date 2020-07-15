@@ -27,7 +27,7 @@ mpos = [300, 200]  # !!记录鼠标位置
 times = 0  # 地鼠跳出的次数
 times_max = 10  # 最多次数
 tick_max = 30  # 地鼠每次跳多少帧
-map = pygame.image.load('fugu.png')  # ！！读取图片
+map = pygame.image.load('resources/images/fugu.png')  # ！！读取图片
 
 while 1:
     for event in pygame.event.get():
