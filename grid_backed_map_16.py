@@ -14,33 +14,50 @@ WHITE    = ( 255, 255, 255)
 GREEN    = (   0, 255,   0)
 RED      = ( 255,   0,   0)
 
-WIDTH  = 90
-HEIGHT = 90
+WIDTH  = 190
+HEIGHT = 190
 MARGIN = 10
 
 # --- Create grid of numbers
 # Create an empty list
-grid = []
-# Loop for each row
-for row in range(10):
-    # For each row, create a list that will
-    # represent an entire row
-    grid.append([])
-    # Loop for each column
-    for column in range(10):
-        # Add a number to the current row
-        grid[row].append(0)
+grid = [[0 for x in range(4)] for y in range(4)]
 
 # Set row 1, column 5 to zero
-grid[1][5] = 1
+for x in range(4):
+    for y in range(4):
+        grid[x][y] = 4 * x + y + 1
+
+class Block(pygame.sprite.Sprite):
+    def __init__(self, screen, position):
+        super().__init__()
+        self.surf = pygame.Surface([WIDTH, HEIGHT])
+        self.color = GREEN
+        self.rect = pygame.draw.rect(
+            screen,
+            self.color,
+            position
+        )
+        self.value = ''
+
+    def update(self, value):
+        # self.rect.flip()
+        self.value = value
+        self.color = RED
+        pygame.transform.rotate(self.surf, 90)
+
+
+block_list = [[] for x in range(4)]
 
 pygame.init()
 
-screen_size = [1010, 1010]
+screen_size = [810, 810]
 screen = pygame.display.set_mode(screen_size)
 # Setup for sounds. Defaults are good.
 pygame.display.set_caption("My Game")
 pygame.mixer.init()
+
+font = pygame.font.SysFont("arial", 64)
+font_height = font.get_linesize()
 
 # sound
 collision_sound = pygame.mixer.Sound("resources/audio/qubodup-crash.ogg")
@@ -60,25 +77,27 @@ while not done:
             pos = pygame.mouse.get_pos()
             column_clicked = pos[0] // (WIDTH + MARGIN)
             row_clicked = pos[1] // (HEIGHT + MARGIN)
-            print("Row:", row_clicked, "Column:", column_clicked)
-            grid[row_clicked][column_clicked] = 1
+            value = str(grid[row_clicked][column_clicked])
+            print("Row:", row_clicked, "Column:", column_clicked, " = ", value)
+            block_clicked = block_list[row_clicked][column_clicked]
+            block_clicked.update(value)
             collision_sound.play()
 
     # Set the screen background
     screen.fill(BLACK)
 
-    for row in range(10):
-        for column in range(10):
+    for row in range(4):
+        for column in range(4):
             if grid[row][column] == 0:
                 color = WHITE
             else:
                 color = GREEN
-            pygame.draw.rect(screen,
-                             color,
-                             [MARGIN + (WIDTH + MARGIN) * column,
-                              MARGIN + (HEIGHT + MARGIN) * row,
-                              WIDTH,
-                              HEIGHT])
+            x = MARGIN + (WIDTH + MARGIN) * column
+            y = MARGIN + (HEIGHT + MARGIN) * row
+            block = Block(screen, [x, y, WIDTH, HEIGHT])
+            block.update(str(grid[row][column]))
+            screen.blit(font.render(block.value, True, (100, 100, 100)), (x + WIDTH/4, y + HEIGHT/4))
+            block_list[row].append(block)
 
     # Limit to 60 frames per second
     clock.tick(60)
