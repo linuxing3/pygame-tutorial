@@ -5,16 +5,44 @@
 
 # helper functions to print list
 
-
-def print_array(array):
+# Function to convert
+def list_to_string_loop(s):
     n = ''
-    for x in range(len(array)):
-        n += str(array[x]) + ' '
-    print(n)
+    for ele in s:
+        n += ele
+    return n
+
+# Python program to convert a list
+# to string using join() function
+
+# Function to convert
 
 
-def print_array_simple(array):
-    for x in range(len(array)):
+def lis_to_string_join(s):
+    n = " "
+    return (n.join(s))
+
+
+def list_to_string_comprehension(list):
+    n = ' '.join([str(elem) for elem in list])
+    return(n)
+
+
+def lis_to_string_map(list):
+    n = ' '.join(map(str, list))
+    return(n)
+
+
+# self-taught
+def print_array_complicated(list):
+    n = ''
+    for x in list:
+        n += str(x) + ' '
+    return(n)
+
+
+def print_array_simple(list):
+    for x in range(len(list)):
         print(x, end=' ')
     print()
 
@@ -99,7 +127,8 @@ for x in range(10):
     n = []
     for y in range(10):
         n.append(10 * x + y)
-    print_array(n)
+    row = lis_to_string_map(n)
+    print(row)
 
 # # q.10
 print('----------------q 10-------------------')
@@ -107,7 +136,8 @@ for x in range(1, 10):
     n = []
     for y in range(1, 10):
         n.append(x * y)
-    print_array(n)
+    row = lis_to_string_map(n)
+    print(row)
 
 
 for i in range(1, 10):
@@ -134,7 +164,8 @@ for x in range(10):
         else:
             n.insert(0, ' ')
             t.append(' ')
-    print_array(n + t[1: len(t)])
+    row = lis_to_string_map(n + t[1: len(t)])
+    print(row)
 
 print('-------------q 11 std------------------')
 for i in range(10):
@@ -153,6 +184,18 @@ for i in range(10):
 # q.12
 print('-------------q 12----------------------')
 
+for i in range(10):
+    # Print leading spaces
+    for j in range(i+2):
+        print(" ", end=" ")
+    # Count up
+    for j in range(1, 9-i):
+        print(j, end=" ")
+    # Count down
+    for j in range(7-i, 0, -1):
+        print(j, end=" ")
+    print()
+
 for x in range(10):
     n = []
     t = []
@@ -163,4 +206,5 @@ for x in range(10):
         else:
             n.insert(0, ' ')
             t.append(' ')
-    print_array(n + t[1: len(t)])
+    row = lis_to_string_map(n + t[1: len(t)])
+    print(row)
