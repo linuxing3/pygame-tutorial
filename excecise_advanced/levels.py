@@ -69,7 +69,7 @@ class Level_01(Level):
         # Call the parent constructor
         Level.__init__(self, player)
 
-        self.background = pygame.image.load("background_01.png").convert()
+        self.background = pygame.image.load("sprite_sheets/background_01.png").convert()
         self.background.set_colorkey(constants.WHITE)
         self.level_limit = -2500
 
@@ -119,7 +119,7 @@ class Level_02(Level):
         # Call the parent constructor
         Level.__init__(self, player)
 
-        self.background = pygame.image.load("background_02.png").convert()
+        self.background = pygame.image.load("sprite_sheets/background_02.png").convert()
         self.background.set_colorkey(constants.WHITE)
         self.level_limit = -1000
 

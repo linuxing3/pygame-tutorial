@@ -14,18 +14,43 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255,   0)
 RED = (255,   0,   0)
 
+# 先搞定画布，比如尺寸、背景、标题
+size = [WIDTH, HEIGHT] = [1024, 768]
+
 # 定义精灵类，实现初始化和更新方法
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, pos_x, pos_y):
         super(Player, self).__init__()
-        self.image = pygame.image.load("alien.png").convert()
+        self.current_image = 0
+        self.animating = False
+        self.sprites = []
+        self.sprites.append(pygame.image.load("alien.png").convert())
+        self.sprites.append(pygame.image.load("alien.png").convert())
+        self.sprites.append(pygame.image.load("alien.png").convert())
+        # load
+        self.image = self.sprites[self.current_image]
         self.image.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.image.get_rect()
+        # position
+        self.rect.topleft = [pos_x, pos_y] 
+        
+    def animate(self):
+        self.animating = True
 
     def update(self, x, y):
+        if self.animating == True:
+            self.current_image += 0.2
+            # stop animating at last image
+            if self.current_image > 10:
+                self.current_image = 0
+                self.animating = False
+        # render image
+        self.image = self.sprites[int(self.current_image)]
+        # moving
         self.rect.move_ip(x, y)
+
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -34,8 +59,8 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.image.load("ufo.png").convert()
         self.image.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.image.get_rect()
-        self.rect.x = 700
-        self.rect.y = random.randint(50, 450)
+        self.rect.x = WIDTH
+        self.rect.y = random.randint(0, HEIGHT)
 
     def update(self, x, y):
         self.rect.move_ip(x, y)
@@ -47,12 +72,26 @@ class Bullet(pygame.sprite.Sprite):
         self.image.set_colorkey((0,0,0), RLEACCEL)
         self.rect = self.image.get_rect()
 
-    def rotate(self, angle):
-        self.image = pygame.transform.rotate(self.image, angle)
+    def rotate(self, angle, start_x, start_y):
+        self.angle = angle
+        self.image = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.image.get_rect()
+        self.rect.x = start_x
+        self.rect.y = start_y
 
-    def update(self, change_x, change_y):
+    def update(self, speed):
+        # use angle to calculate x,y
+        arc = (360 -self.angle) / 57.27
+        change_x = math.cos(arc) * speed
+        change_y = math.sin(arc) * speed
         self.rect.move_ip(change_x, change_y)
+
+class Background():
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("sprite_sheets/background_01.png").convert()
+        self.rect = self.image.get_rect()
+        self.rect.topleft = [0, 0]
 
 def show_text(screen, text, position):
     font = pygame.font.Font(None, 36)
@@ -65,6 +104,7 @@ def play_bmg():
     pygame.mixer.music.load('resources/audio/moonlight.wav')
     pygame.mixer.music.play(-1, 0.0)
     pygame.mixer.music.set_volume(0.25)
+
 
 # 主函数
 
@@ -79,8 +119,6 @@ def main():
     pygame.init()
     pygame.mixer.init()
 
-    # 先搞定画布，比如尺寸、背景、标题
-    size = [WIDTH, HEIGHT] = [700, 500]
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("My Game")
 
@@ -99,10 +137,12 @@ def main():
 
     bullets = []
 
-    player = Player()
+    player = Player(100, 100)
     players.add(player)
     allsprites.add(player)
 
+    # 
+    bg = Background()
     # 音乐
     collision_sound = pygame.mixer.Sound("resources/audio/qubodup-crash.ogg")
     play_bmg()
@@ -133,6 +173,8 @@ def main():
                     keys[2] = True
                 elif event.key == K_d:
                     keys[3] = True
+                elif event.key == K_p:
+                    player.animate()
             if event.type == KEYUP:  # 放开某键
                 if event.key == K_w:
                     keys[0] = False
@@ -151,7 +193,7 @@ def main():
                 bullet_rotate_angle = 360 - bullet_rotate_arc * 57.27
                 print('[arrow] angel ' + str(bullet_rotate_angle))
                 bullet = Bullet()
-                bullet.rotate(bullet_rotate_angle)
+                bullet.rotate(bullet_rotate_angle, player.rect.x, player.rect.y)
                 bullets.append(bullet)
 
 
@@ -182,8 +224,19 @@ def main():
         for enemy in enemies:
             enemy.update(-20, 0)
 
+        index = 0
         for bullet in bullets:
-            bullet.update(50, 50)
+            x, y = bullet.rect.x, bullet.rect.y
+            bullet.update(50)
+            # 出界消失
+            if x < -64 or x > 640 or y < -64 or y > 480:
+                bullets.pop(index)
+            if pygame.sprite.spritecollide(bullet, enemies, True):
+                collision_sound.play()
+                # 撞击消失
+                bullets.pop(index)
+                score += 1
+            index += 1
 
         # 状态机【8】 精灵旋转的位置状态和角度状态
         mouse_position = pygame.mouse.get_pos()
@@ -199,9 +252,9 @@ def main():
                        [0] / 2, player.rect.y - rotated_player_image.get_rect()[1] / 2]
 
         # 状态机【6】  检测撞击状态
-        if pygame.sprite.spritecollide(player, enemies, True):
+        if pygame.sprite.spritecollide(player, enemies, False):
             collision_sound.play()
-            score += 1
+            score -= 1
 
         # 游戏逻辑结束
         # ==================================================================
@@ -212,6 +265,7 @@ def main():
         # 绘图流程开始
         # 画背景
         screen.fill(WHITE)
+        screen.blit(bg.image, bg.rect)
 
         # 画出精灵， 单独或分组画
         # screen.blit(player.surf, player.rect)
