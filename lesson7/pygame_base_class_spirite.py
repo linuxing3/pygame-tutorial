@@ -26,9 +26,9 @@ class Player(pygame.sprite.Sprite):
         self.current_image = 0
         self.animating = False
         self.sprites = []
-        self.sprites.append(pygame.image.load("alien.png").convert())
-        self.sprites.append(pygame.image.load("alien.png").convert())
-        self.sprites.append(pygame.image.load("alien.png").convert())
+        self.sprites.append(pygame.image.load("resources/images/alien.png").convert())
+        self.sprites.append(pygame.image.load("resources/images/alien.png").convert())
+        self.sprites.append(pygame.image.load("resources/images/alien.png").convert())
         # load
         self.image = self.sprites[self.current_image]
         self.image.set_colorkey((0, 0, 0), RLEACCEL)
@@ -56,7 +56,7 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super(Enemy, self).__init__()
-        self.image = pygame.image.load("ufo.png").convert()
+        self.image = pygame.image.load("resources/images/ufo.png").convert()
         self.image.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.image.get_rect()
         self.rect.x = WIDTH
@@ -89,7 +89,7 @@ class Bullet(pygame.sprite.Sprite):
 class Background():
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("sprite_sheets/background_01.png").convert()
+        self.image = pygame.image.load("excecise_advanced/background_01.png").convert()
         self.rect = self.image.get_rect()
         self.rect.topleft = [0, 0]
 
@@ -231,11 +231,12 @@ def main():
             # 出界消失
             if x < -64 or x > 640 or y < -64 or y > 480:
                 bullets.pop(index)
+            # 撞击消失
             if pygame.sprite.spritecollide(bullet, enemies, True):
-                collision_sound.play()
-                # 撞击消失
-                bullets.pop(index)
-                score += 1
+                if len(bullets) > 0:
+                    collision_sound.play()
+                    bullets.pop(index)
+                    score += 1
             index += 1
 
         # 状态机【8】 精灵旋转的位置状态和角度状态
