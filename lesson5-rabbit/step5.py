@@ -87,7 +87,7 @@ while running:
                   playerpos[1]-playerrot.get_rect().height/2)
     screen.blit(playerrot, playerpos1)
 
-    # 6.2 - 射箭
+    # 6.2 - 射箭, bullet = [ 角度, 下一横坐标速度， 下一纵坐标速度 ]
     for bullet in arrows:
         # 这里的index是arrows的索引
         index = 0

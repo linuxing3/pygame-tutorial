@@ -6,6 +6,7 @@
 import pygame
 from pygame.locals import *
 import random
+import math
 
 # 定义常量，比如颜色、按键等
 BLACK = (0,   0,   0)
@@ -39,6 +40,19 @@ class Enemy(pygame.sprite.Sprite):
     def update(self, x, y):
         self.rect.move_ip(x, y)
 
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Bullet).__init__()
+        self.image = pygame.image.load("resources/images/bullet.png").convert()
+        self.image.set_colorkey((0,0,0), RLEACCEL)
+        self.rect = self.image.get_rect()
+
+    def rotate(self, angle):
+        self.image = pygame.transform.rotate(self.image, angle)
+        self.rect = self.image.get_rect()
+
+    def update(self, change_x, change_y):
+        self.rect.move_ip(change_x, change_y)
 
 def show_text(screen, text, position):
     font = pygame.font.Font(None, 36)
@@ -83,6 +97,8 @@ def main():
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
 
+    bullets = []
+
     player = Player()
     players.add(player)
     allsprites.add(player)
@@ -126,6 +142,19 @@ def main():
                     keys[2] = False
                 elif event.key == K_d:
                     keys[3] = False
+            if event.type == MOUSEBUTTONDOWN:
+                # 计算角度
+                mouse_position = pygame.mouse.get_pos()
+                # 计算弧度，转化为角度，三角函数上场，1 arc =  180 / pi，因为360度就是 2 * pi的圆周
+                bullet_rotate_arc = math.atan2(
+                    mouse_position[1] - player.rect.y, mouse_position[0] - player.rect.x)
+                bullet_rotate_angle = 360 - bullet_rotate_arc * 57.27
+                print('[arrow] angel ' + str(bullet_rotate_angle))
+                bullet = Bullet()
+                bullet.rotate(bullet_rotate_angle)
+                bullets.append(bullet)
+
+
         # 事件状态机结束
         # ==================================================================
         # <<<
@@ -153,6 +182,22 @@ def main():
         for enemy in enemies:
             enemy.update(-20, 0)
 
+        for bullet in bullets:
+            bullet.update(50, 50)
+
+        # 状态机【8】 精灵旋转的位置状态和角度状态
+        mouse_position = pygame.mouse.get_pos()
+        # 计算弧度，转化为角度，三角函数上场，1 arc =  180 / pi，因为360度就是 2 * pi的圆周
+        arc = math.atan2(
+            mouse_position[1] - player.rect.y, mouse_position[0] - player.rect.x)
+        angle = 360 - arc * 57.27
+        # rotate的第二个参数必须是角度，不是弧度
+        # rotate的第一个参数是图像，而不是我们的player实例
+        # rotate的返回值也是图像，可以使用get_rect方法，输出[w, h]
+        rotated_player_image = pygame.transform.rotate(player.image, angle)
+        ratated_player_pos = [player.rect.x - rotated_player_image.get_rect()
+                       [0] / 2, player.rect.y - rotated_player_image.get_rect()[1] / 2]
+
         # 状态机【6】  检测撞击状态
         if pygame.sprite.spritecollide(player, enemies, True):
             collision_sound.play()
@@ -172,8 +217,13 @@ def main():
         # screen.blit(player.surf, player.rect)
         # for enemy in enemies:
         #     screen.blit(enemy.surf, enemy.rect)
-        allsprites.draw(screen)
+        enemies.draw(screen)
 
+        screen.blit(rotated_player_image, ratated_player_pos)
+
+        for bullet in bullets:
+            screen.blit(bullet.image, bullet.rect)
+            
         # 显示横幅
         show_text(screen, "Hit" + str(score), [WIDTH/2, 0])
 
