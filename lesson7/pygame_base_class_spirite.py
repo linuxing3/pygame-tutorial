@@ -8,14 +8,13 @@ from pygame.locals import *
 import random
 import math
 
+from constants import *
+from spritesheet_functions import SpriteSheet
+
 # 定义常量，比如颜色、按键等
-BLACK = (0,   0,   0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255,   0)
-RED = (255,   0,   0)
 
 # 先搞定画布，比如尺寸、背景、标题
-size = [WIDTH, HEIGHT] = [1024, 768]
+size = [WIDTH, HEIGHT]
 
 # 定义精灵类，实现初始化和更新方法
 
@@ -23,12 +22,24 @@ size = [WIDTH, HEIGHT] = [1024, 768]
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super(Player, self).__init__()
+        sprite_sheet = SpriteSheet("excecise_advanced/p1_walk.png")
         self.current_image = 0
         self.animating = False
         self.sprites = []
-        self.sprites.append(pygame.image.load("resources/images/alien.png").convert())
-        self.sprites.append(pygame.image.load("resources/images/alien.png").convert())
-        self.sprites.append(pygame.image.load("resources/images/alien.png").convert())
+        image = sprite_sheet.get_image(0, 0, 66, 90)
+        self.sprites.append(image)
+        image = sprite_sheet.get_image(66, 0, 66, 90)
+        self.sprites.append(image)
+        image = sprite_sheet.get_image(132, 0, 67, 90)
+        self.sprites.append(image)
+        image = sprite_sheet.get_image(0, 93, 66, 90)
+        self.sprites.append(image)
+        image = sprite_sheet.get_image(66, 93, 66, 90)
+        self.sprites.append(image)
+        image = sprite_sheet.get_image(132, 93, 72, 90)
+        self.sprites.append(image)
+        image = sprite_sheet.get_image(0, 186, 70, 90)
+        self.sprites.append(image)
         # load
         self.image = self.sprites[self.current_image]
         self.image.set_colorkey((0, 0, 0), RLEACCEL)
@@ -43,7 +54,7 @@ class Player(pygame.sprite.Sprite):
         if self.animating == True:
             self.current_image += 0.2
             # stop animating at last image
-            if self.current_image > 10:
+            if self.current_image > 7:
                 self.current_image = 0
                 self.animating = False
         # render image
@@ -173,8 +184,6 @@ def main():
                     keys[2] = True
                 elif event.key == K_d:
                     keys[3] = True
-                elif event.key == K_p:
-                    player.animate()
             if event.type == KEYUP:  # 放开某键
                 if event.key == K_w:
                     keys[0] = False
@@ -213,17 +222,23 @@ def main():
 
         # 状态机【5】  按键监听器，更新精灵状态
         if keys[0]:
+            player.animate()
             player.update(0, -10)
         elif keys[2]:
+            player.animate()
             player.update(0, 10)
         if keys[1]:
+            player.animate()
             player.update(-10, 0)
         elif keys[3]:
+            player.animate()
             player.update(10, 0)
 
+        # 敌人状态 更新
         for enemy in enemies:
             enemy.update(-20, 0)
 
+        # 子弹状态更新
         index = 0
         for bullet in bullets:
             x, y = bullet.rect.x, bullet.rect.y
@@ -233,10 +248,10 @@ def main():
                 bullets.pop(index)
             # 撞击消失
             if pygame.sprite.spritecollide(bullet, enemies, True):
+                score += 1
                 if len(bullets) > 0:
                     collision_sound.play()
                     bullets.pop(index)
-                    score += 1
             index += 1
 
         # 状态机【8】 精灵旋转的位置状态和角度状态
@@ -253,9 +268,19 @@ def main():
                        [0] / 2, player.rect.y - rotated_player_image.get_rect()[1] / 2]
 
         # 状态机【6】  检测撞击状态
-        if pygame.sprite.spritecollide(player, enemies, False):
+        if pygame.sprite.spritecollide(player, enemies, True):
             collision_sound.play()
             score -= 1
+
+        # 获胜状态
+        if score > 15:
+            enemies.clear()
+            show_text(screen, "You Win", [ WIDTH/2, HEIGHT/2])
+            
+        if score == 0:
+            player.kill()
+            show_text(screen, "You Loose", [ WIDTH/2, HEIGHT/2])
+            
 
         # 游戏逻辑结束
         # ==================================================================
